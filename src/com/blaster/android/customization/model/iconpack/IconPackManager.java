@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package co.aospa.android.customization.model.font;
+package com.blaster.android.customization.model.iconpack;
 
-import static com.android.customization.model.ResourceConstants.ANDROID_PACKAGE;
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_FONT;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_ANDROID;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_SETTINGS;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_SYSUI;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -37,17 +38,18 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FontManager implements CustomizationManager<FontOption> {
+public class IconPackManager implements CustomizationManager<IconPackOption> {
 
-    private static FontManager sFontOptionManager;
+    private static IconPackManager sIconPackOptionManager;
     private Context mContext;
-    private FontOption mActiveOption;
+    private IconPackOption mActiveOption;
     private OverlayManagerCompat mOverlayManager;
-    private FontOptionProvider mProvider;
-    private static final String TAG = "FontManager";
-    private static final String KEY_STATE_CURRENT_SELECTION = "FontManager.currentSelection";
+    private IconPackOptionProvider mProvider;
+    private static final String TAG = "IconPackManager";
+    private static final String KEY_STATE_CURRENT_SELECTION = "IconPackManager.currentSelection";
+    private static final String[] mCurrentCategories = new String[]{OVERLAY_CATEGORY_ICON_ANDROID, OVERLAY_CATEGORY_ICON_SETTINGS, OVERLAY_CATEGORY_ICON_SYSUI};
 
-    FontManager(Context context, OverlayManagerCompat overlayManager, FontOptionProvider provider) {
+    IconPackManager(Context context, OverlayManagerCompat overlayManager, IconPackOptionProvider provider) {
         mContext = context;
         mProvider = provider;
         mOverlayManager = overlayManager;
@@ -59,23 +61,20 @@ public class FontManager implements CustomizationManager<FontOption> {
     }
 
     @Override
-    public void apply(FontOption option, @Nullable Callback callback) {
+    public void apply(IconPackOption option, @Nullable Callback callback) {
         if (!persistOverlay(option)) {
-            Toast failed = Toast.makeText(mContext, "Failed to apply font, reboot to try again.", Toast.LENGTH_SHORT);
+            Toast failed = Toast.makeText(mContext, "Failed to apply icon pack, reboot to try again.", Toast.LENGTH_SHORT);
             failed.show();
             if (callback != null) {
                 callback.onError(null);
             }
             return;
         }
-        if (option.getPackageName() == null) {
-            if (mActiveOption.getPackageName() == null) return;
-            for (String overlay : mOverlayManager.getOverlayPackagesForCategory(
-                    OVERLAY_CATEGORY_FONT, UserHandle.myUserId(), ANDROID_PACKAGE)) {
-                mOverlayManager.disableOverlay(overlay, UserHandle.myUserId());
-            }
+        if (option.isDefault()) {
+            if (mActiveOption.isDefault()) return;
+            mActiveOption.getOverlayPackages().forEach((category, overlay) -> mOverlayManager.disableOverlay(overlay, UserHandle.myUserId()));
         } else {
-            mOverlayManager.setEnabledExclusiveInCategory(option.getPackageName(), UserHandle.myUserId());
+            option.getOverlayPackages().forEach((category, overlay) -> mOverlayManager.setEnabledExclusiveInCategory(overlay, UserHandle.myUserId()));
         }
         if (callback != null) {
             callback.onSuccess();
@@ -84,10 +83,10 @@ public class FontManager implements CustomizationManager<FontOption> {
     }
 
     @Override
-    public void fetchOptions(OptionsFetchedListener<FontOption> callback, boolean reload) {
-        List<FontOption> options = mProvider.getOptions(reload);
-        for (FontOption option : options) {
-            if (isActive(option)) {
+    public void fetchOptions(OptionsFetchedListener<IconPackOption> callback, boolean reload) {
+        List<IconPackOption> options = mProvider.getOptions();
+        for (IconPackOption option : options) {
+            if (option.isActive(this)) {
                 mActiveOption = option;
                 break;
             }
@@ -99,16 +98,7 @@ public class FontManager implements CustomizationManager<FontOption> {
         return mOverlayManager;
     }
 
-    public boolean isActive(FontOption option) {
-        String enabledPkg = mOverlayManager.getEnabledPackageName(ANDROID_PACKAGE, OVERLAY_CATEGORY_FONT);
-        if (enabledPkg != null) {
-            return enabledPkg.equals(option.getPackageName());
-        } else {
-            return option.getPackageName() == null;
-        }
-    }
-
-    private boolean persistOverlay(FontOption toPersist) {
+    private boolean persistOverlay(IconPackOption toPersist) {
         String value = Settings.Secure.getStringForUser(mContext.getContentResolver(),
                 Settings.Secure.THEME_CUSTOMIZATION_OVERLAY_PACKAGES, UserHandle.USER_CURRENT);
         JSONObject json;
@@ -123,13 +113,17 @@ public class FontManager implements CustomizationManager<FontOption> {
             }
         }
         // removing all currently enabled overlays from the json
-        json.remove(OVERLAY_CATEGORY_FONT);
+        for (String categoryName : mCurrentCategories) {
+            json.remove(categoryName);
+        }
         // adding the new ones
-        try {
-            json.put(OVERLAY_CATEGORY_FONT, toPersist.getPackageName());
-        } catch (JSONException e) {
-            Log.e(TAG, "Error adding new settings value:\n" + e.getMessage());
-            return false;
+        for (String categoryName : mCurrentCategories) {
+            try {
+                json.put(categoryName, toPersist.getOverlayPackages().get(categoryName));
+            } catch (JSONException e) {
+                Log.e(TAG, "Error adding new settings value:\n" + e.getMessage());
+                return false;
+            }
         }
         // updating the setting
         Settings.Secure.putStringForUser(mContext.getContentResolver(),
@@ -138,12 +132,12 @@ public class FontManager implements CustomizationManager<FontOption> {
         return true;
     }
 
-    public static FontManager getInstance(Context context, OverlayManagerCompat overlayManager) {
-        if (sFontOptionManager == null) {
+    public static IconPackManager getInstance(Context context, OverlayManagerCompat overlayManager) {
+        if (sIconPackOptionManager == null) {
             Context applicationContext = context.getApplicationContext();
-            sFontOptionManager = new FontManager(context, overlayManager, new FontOptionProvider(applicationContext, overlayManager));
+            sIconPackOptionManager = new IconPackManager(context, overlayManager, new IconPackOptionProvider(applicationContext, overlayManager));
         }
-        return sFontOptionManager;
+        return sIconPackOptionManager;
     }
 
 }

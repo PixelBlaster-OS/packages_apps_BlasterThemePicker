@@ -1,4 +1,4 @@
-package co.aospa.android.customization.module;
+package com.blaster.android.customization.module;
 
 import android.os.Bundle;
 
@@ -44,16 +44,16 @@ import com.android.wallpaper.picker.customization.ui.section.WallpaperQuickSwitc
 import com.android.wallpaper.picker.customization.ui.viewmodel.WallpaperQuickSwitchViewModel;
 import com.android.wallpaper.util.DisplayUtils;
 
-import co.aospa.android.customization.model.font.FontManager;
-import co.aospa.android.customization.model.font.FontSectionController;
-import co.aospa.android.customization.model.iconpack.IconPackManager;
-import co.aospa.android.customization.model.iconpack.IconPackSectionController;
+import com.blaster.android.customization.model.font.FontManager;
+import com.blaster.android.customization.model.font.FontSectionController;
+import com.blaster.android.customization.model.iconpack.IconPackManager;
+import com.blaster.android.customization.model.iconpack.IconPackSectionController;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** {@link CustomizationSections} for the customization picker. */
-public final class AospaCustomizationSections implements CustomizationSections {
+public final class BlasterCustomizationSections implements CustomizationSections {
 
     private final ColorPickerViewModel.Factory mColorPickerViewModelFactory;
     private final KeyguardQuickAffordancePickerInteractor mKeyguardQuickAffordancePickerInteractor;
@@ -67,7 +67,7 @@ public final class AospaCustomizationSections implements CustomizationSections {
     private final ThemedIconSnapshotRestorer mThemedIconSnapshotRestorer;
     private final ThemedIconInteractor mThemedIconInteractor;
 
-    public AospaCustomizationSections(
+    public BlasterCustomizationSections(
             ColorPickerViewModel.Factory colorPickerViewModelFactory,
             KeyguardQuickAffordancePickerInteractor keyguardQuickAffordancePickerInteractor,
             KeyguardQuickAffordancePickerViewModel.Factory

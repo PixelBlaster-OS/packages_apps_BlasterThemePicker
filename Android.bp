@@ -1,17 +1,18 @@
 //
 // Copyright (C) 2022 StatiXOS
 // Copyright (C) 2022 Paranoid Android
+// Copyright (C) 2023 PixelBlaster-OS
 // SPDX-License-Identifer: Apache-2.0
 //
 
 package {
-    default_applicable_licenses: ["packages_apps_Aospa_ThemePicker_license"],
+    default_applicable_licenses: ["packages_apps_Blaster_ThemePicker_license"],
 }
 
 // Added automatically by a large-scale-change
 // See: http://go/android-license-faq
 license {
-    name: "packages_apps_Aospa_ThemePicker_license",
+    name: "packages_apps_Blaster_ThemePicker_license",
     visibility: [":__subpackages__"],
     license_kinds: [
         "SPDX-license-identifier-Apache-2.0",
@@ -22,7 +23,7 @@ license {
 }
 
 filegroup {
-    name: "ParanoidThemePicker_srcs",
+    name: "BlasterThemePicker_srcs",
     srcs: [
         "src/**/*.java",
         "src/**/*.kt",
@@ -30,26 +31,26 @@ filegroup {
 }
 
 filegroup {
-    name: "ParanoidThemePicker_Manifest",
+    name: "BlasterThemePicker_Manifest",
     srcs: [
         "AndroidManifest.xml",
     ],
 }
 
 genrule {
-    name: "ParanoidThemePicker_res",
+    name: "BlasterThemePicker_res",
     tools: ["soong_zip"],
     srcs: [
         "res/**/*"
     ],
-    out: ["ParanoidThemePicker_res.zip"],
+    out: ["BlasterThemePicker_res.zip"],
     cmd: "INPUTS=($(in)) && "
         + "RES_DIR=$$(dirname $$(dirname $${INPUTS[0]})) && "
         + "$(location soong_zip) -o $(out) -C $$RES_DIR -D $$RES_DIR"
 }
 
 genrule {
-    name: "ParanoidThemePicker_res_overrides",
+    name: "BlasterThemePicker_res_overrides",
     tools: ["soong_zip"],
     srcs: [
         "res_override/**/*",
@@ -61,7 +62,7 @@ genrule {
 }
 
 android_library {
-    name: "ParanoidThemePicker-core",
+    name: "BlasterThemePicker-core",
 
     defaults: ["ThemePicker_defaults"],
 
@@ -80,16 +81,16 @@ android_library {
 // Build app code.
 //
 android_app {
-    name: "ParanoidThemePicker",
+    name: "BlasterThemePicker",
 
     static_libs: [
-        "ParanoidThemePicker-core",
+        "BlasterThemePicker-core",
     ],
 
     srcs: [
         ":WallpaperPicker2_srcs",
         ":ThemePicker_srcs",
-        ":ParanoidThemePicker_srcs",
+        ":BlasterThemePicker_srcs",
         "src_override/**/*.java",
         "src_override/**/*.kt",
     ],
@@ -100,7 +101,7 @@ android_app {
 
     use_embedded_native_libs: true,
 
-    resource_zips: [":WallpaperPicker2_res", ":ThemePicker_res", ":ParanoidThemePicker_res", ":ParanoidThemePicker_res_overrides"],
+    resource_zips: [":WallpaperPicker2_res", ":ThemePicker_res", ":BlasterThemePicker_res", ":BlasterThemePicker_res_overrides"],
 
     optimize: {
         enabled: false,
@@ -119,12 +120,12 @@ android_app {
     required: [
         "privapp_whitelist_com.android.wallpaper",
         "default_permissions_com.android.wallpaper",
-        "ParanoidColorStub",
+        "BlasterColorStub",
     ],
 }
 
 android_app {
-    name: "ParanoidColorStub",
+    name: "BlasterColorStub",
     manifest: "AndroidManifest-Stub.xml",
     resource_dirs: ["res-stub"],
 

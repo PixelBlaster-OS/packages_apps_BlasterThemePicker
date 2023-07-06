@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package co.aospa.android.customization.picker.font;
+package com.blaster.android.customization.picker.iconpack;
 
 import static com.android.wallpaper.widget.BottomActionBar.BottomAction.APPLY_TEXT;
 
@@ -41,37 +41,37 @@ import com.android.wallpaper.R;
 import com.android.wallpaper.picker.AppbarFragment;
 import com.android.wallpaper.widget.BottomActionBar;
 
-import co.aospa.android.customization.model.font.FontOption;
-import co.aospa.android.customization.model.font.FontManager;
+import com.blaster.android.customization.model.iconpack.IconPackOption;
+import com.blaster.android.customization.model.iconpack.IconPackManager;
 
 import java.util.List;
 
 /**
- * Fragment that contains the UI for selecting and applying a FontOption.
+ * Fragment that contains the UI for selecting and applying a IconPackOption.
  */
-public class FontFragment extends AppbarFragment {
+public class IconPackFragment extends AppbarFragment {
 
-    private static final String TAG = "FontFragment";
-    private static final String KEY_STATE_SELECTED_OPTION = "FontFragment.selectedOption";
+    private static final String TAG = "IconPackFragment";
+    private static final String KEY_STATE_SELECTED_OPTION = "IconPackFragment.selectedOption";
     private static final String KEY_STATE_BOTTOM_ACTION_BAR_VISIBLE =
-            "FontFragment.bottomActionBarVisible";
+            "IconPackFragment.bottomActionBarVisible";
 
-    public static FontFragment newInstance(CharSequence title) {
-        FontFragment fragment = new FontFragment();
+    public static IconPackFragment newInstance(CharSequence title) {
+        IconPackFragment fragment = new IconPackFragment();
         fragment.setArguments(AppbarFragment.createArguments(title));
         return fragment;
     }
 
     private RecyclerView mOptionsContainer;
-    private OptionSelectorController<FontOption> mOptionsController;
-    private FontManager mFontManager;
-    private FontOption mSelectedOption;
+    private OptionSelectorController<IconPackOption> mOptionsController;
+    private IconPackManager mIconPackManager;
+    private IconPackOption mSelectedOption;
     private ContentLoadingProgressBar mLoading;
     private ViewGroup mContent;
     private View mError;
     private BottomActionBar mBottomActionBar;
 
-    private final Callback mApplyFontCallback = new Callback() {
+    private final Callback mApplyIconPackCallback = new Callback() {
         @Override
         public void onSuccess() {
         }
@@ -90,7 +90,7 @@ public class FontFragment extends AppbarFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(
-                R.layout.fragment_font_picker, container, /* attachToRoot */ false);
+                R.layout.fragment_icon_pack_picker, container, /* attachToRoot */ false);
         setUpToolbar(view);
         mContent = view.findViewById(R.id.content_section);
         mOptionsContainer = view.findViewById(R.id.options_container);
@@ -107,7 +107,7 @@ public class FontFragment extends AppbarFragment {
             return windowInsets.consumeSystemWindowInsets();
         });
 
-        mFontManager = FontManager.getInstance(getContext(), new OverlayManagerCompat(getContext()));
+        mIconPackManager = IconPackManager.getInstance(getContext(), new OverlayManagerCompat(getContext()));
         setUpOptions(savedInstanceState);
 
         return view;
@@ -126,24 +126,24 @@ public class FontFragment extends AppbarFragment {
         super.onBottomActionBarReady(bottomActionBar);
         mBottomActionBar = bottomActionBar;
         mBottomActionBar.showActionsOnly(APPLY_TEXT);
-        mBottomActionBar.setActionClickListener(APPLY_TEXT, v -> applyFontOption(mSelectedOption));
+        mBottomActionBar.setActionClickListener(APPLY_TEXT, v -> applyIconPackOption(mSelectedOption));
     }
 
-    private void applyFontOption(FontOption fontOption) {
+    private void applyIconPackOption(IconPackOption iconPackOption) {
         mBottomActionBar.disableActions();
-        mFontManager.apply(fontOption, mApplyFontCallback);
+        mIconPackManager.apply(iconPackOption, mApplyIconPackCallback);
     }
 
     private void setUpOptions(@Nullable Bundle savedInstanceState) {
         hideError();
         mLoading.show();
-        mFontManager.fetchOptions(new OptionsFetchedListener<FontOption>() {
+        mIconPackManager.fetchOptions(new OptionsFetchedListener<IconPackOption>() {
             @Override
-            public void onOptionsLoaded(List<FontOption> options) {
+            public void onOptionsLoaded(List<IconPackOption> options) {
                 mLoading.hide();
                 mOptionsController = new OptionSelectorController<>(
                         mOptionsContainer, options, /* useGrid= */ false, CheckmarkStyle.CORNER);
-                mOptionsController.initOptions(mFontManager);
+                mOptionsController.initOptions(mIconPackManager);
                 mSelectedOption = getActiveOption(options);
                 mOptionsController.setSelectedOption(mSelectedOption);
                 onOptionSelected(mSelectedOption);
@@ -158,18 +158,18 @@ public class FontFragment extends AppbarFragment {
             @Override
             public void onError(@Nullable Throwable throwable) {
                 if (throwable != null) {
-                    Log.e(TAG, "Error loading Font options", throwable);
+                    Log.e(TAG, "Error loading iconpack options", throwable);
                 }
                 showError();
             }
         }, /*reload= */ true);
     }
 
-    private FontOption getActiveOption(List<FontOption> options) {
+    private IconPackOption getActiveOption(List<IconPackOption> options) {
         return options.stream()
-                .filter(option -> mFontManager.isActive(option))
+                .filter(option -> option.isActive(mIconPackManager))
                 .findAny()
-                // For development only, as there should always be an Font set.
+                // For development only, as there should always be an iconpack set.
                 .orElse(options.get(0));
     }
 
@@ -185,7 +185,7 @@ public class FontFragment extends AppbarFragment {
     }
 
     private void onOptionSelected(CustomizationOption selectedOption) {
-        mSelectedOption = (FontOption) selectedOption;
+        mSelectedOption = (IconPackOption) selectedOption;
         refreshPreview();
     }
 

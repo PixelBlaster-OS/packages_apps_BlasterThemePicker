@@ -11,7 +11,7 @@
      limitations under the License.
 -->
 <resources>
-    <string name="app_name">AOSPA Colors</string>
+    <string name="app_name">Blaster Colors</string>
 
     <!-- Default -->
     <string name="default_color_name">Default</string>

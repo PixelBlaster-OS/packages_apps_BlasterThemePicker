@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package co.aospa.android.customization.model.iconpack;
+package com.blaster.android.customization.model.iconpack;
 
 import static com.android.customization.model.ResourceConstants.ANDROID_PACKAGE;
 import static com.android.customization.model.ResourceConstants.ICONS_FOR_PREVIEW;

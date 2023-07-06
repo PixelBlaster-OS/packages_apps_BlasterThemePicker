@@ -1,4 +1,4 @@
-package co.aospa.android.customization.picker.font;
+package com.blaster.android.customization.picker.font;
 
 import android.content.Context;
 import android.util.AttributeSet;
