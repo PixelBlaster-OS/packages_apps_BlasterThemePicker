@@ -92,6 +92,7 @@ public final class BlasterCustomizationSections implements CustomizationSections
         mThemedIconSnapshotRestorer = themedIconSnapshotRestorer;
         mThemedIconInteractor = themedIconInteractor;
     }
+
     @Override
     public List<CustomizationSectionController<?>> getRevampedUISectionControllersForScreen(
             Screen screen,
@@ -109,6 +110,7 @@ public final class BlasterCustomizationSections implements CustomizationSections
             WallpaperManager wallpaperManager,
             boolean isTwoPaneAndSmallWidth) {
         List<CustomizationSectionController<?>> sectionControllers = new ArrayList<>();
+
         // Wallpaper section.
         sectionControllers.add(
                 mFlags.isCustomClocksEnabled(activity)
@@ -184,6 +186,7 @@ public final class BlasterCustomizationSections implements CustomizationSections
                 // More settings section.
                 sectionControllers.add(new MoreSettingsSectionController());
                 break;
+
             case HOME_SCREEN:
                 // Themed app icon section.
                 sectionControllers.add(
@@ -200,16 +203,20 @@ public final class BlasterCustomizationSections implements CustomizationSections
                                 sectionNavigationController,
                                 lifecycleOwner,
                                 /* isRevampedUiEnabled= */ true));
+
+                // Icon pack selection section.
+                sectionControllers.add(
+                        new IconPackSectionController(
+                                IconPackManager.getInstance(activity, new OverlayManagerCompat(activity)),
+                                sectionNavigationController));
+
+                // Font selection section.
+                sectionControllers.add(
+                        new FontSectionController(
+                                FontManager.getInstance(activity, new OverlayManagerCompat(activity)),
+                                sectionNavigationController));
                 break;
         }
-
-        // Icon pack selection section.
-        sectionControllers.add(new IconPackSectionController(
-                IconPackManager.getInstance(activity, new OverlayManagerCompat(activity)), sectionNavigationController));
-
-        // Font selection section.
-        sectionControllers.add(new FontSectionController(
-                FontManager.getInstance(activity, new OverlayManagerCompat(activity)), sectionNavigationController));
 
         return sectionControllers;
     }
@@ -263,17 +270,6 @@ public final class BlasterCustomizationSections implements CustomizationSections
                         sectionNavigationController,
                         lifecycleOwner,
                         /* isRevampedUiEnabled= */ false));
-
-        // Lock screen quick affordances section.
-        sectionControllers.add(
-                new KeyguardQuickAffordanceSectionController(
-                        sectionNavigationController,
-                        mKeyguardQuickAffordancePickerInteractor,
-                        new ViewModelProvider(
-                                activity,
-                                mKeyguardQuickAffordancePickerViewModelFactory)
-                                .get(KeyguardQuickAffordancePickerViewModel.class),
-                        lifecycleOwner));
 
         // Icon pack selection section.
         sectionControllers.add(new IconPackSectionController(
